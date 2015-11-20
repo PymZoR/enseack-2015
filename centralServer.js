@@ -14,6 +14,8 @@ let cities = {};
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use(express.static('node_modules/leaflet'));
+app.use(express.static('node_modules/loaders.css'));
 
 app.get('/uptakeCity/:cityName', (req, res) => {
     const cityName = req.params.cityName;

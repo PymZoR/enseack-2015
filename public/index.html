@@ -3,28 +3,44 @@
         <title>Enseak 2015</title>
 
         <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="/dist/leaflet.css">
+        <link rel="stylesheet" href="loaders.min.css">
     </head>
 
     <body>
+        <div id="shadow" style="display: none;"></div>
         <div id="map"></div>
         <div id="table">
+            <div id="loader">
+                <div class="loader-inner ball-scale-multiple">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th>Ville</th>
-                        <th>Consommation de la ville</th>
-                        <th>Energie renouvelable</th>
-                        <th>Energie exploitable</th>
+                        <th class="num">Population</th>
+                        <th class="num">Consommation de la ville (kWh/an)</th>
+                        <th class="num">Energie renouvelable (%)</th>
+                        <th class="num">Energie renouvelable exploitable (%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <th>Paris</th>
-                        <td>3965300.5</td>
-                        <td>10%</td>
+                        <td id="cityName">Paris</td>
+                        <td class="num" id="cityPopulation">3965300.5</td>
+                        <td class="num" id="cityUptake">3965300.5</td>
+                        <td class="num" id="cityRenew">10%</td>
+                        <td class="num" id="cityRenewPossible">18%</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+         <script defer src="/dist/leaflet.js"></script>
+         <script defer src="script.js"></script>
     </body>
 </html>
