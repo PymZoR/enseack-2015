@@ -1,5 +1,5 @@
 {
-  "name": "enseack-2015 central server",
+  "name": "enseack-2015-central-server",
   "version": "1.0.0",
   "description": "Enseak",
   "main": "centralServer.js",
@@ -15,6 +15,8 @@
   },
   "homepage": "https://github.com/PymZoR/enseack-2015#readme",
   "dependencies": {
+    "axios": "^0.7.0",
+    "body-parser": "^1.14.1",
     "express": "^4.13.3"
   }
 }
