@@ -4,6 +4,7 @@
 var Promise    = require('bluebird');
 var httpClient = require('axios');
 var config     = require('../config');
+var colors     = require('colors');
 var sp         = Promise.promisifyAll(require('serialport'));
 var SerialPort = sp.SerialPort;
 
@@ -29,6 +30,14 @@ function sendData(sun, wind) {
         .catch(function (err) {
             console.log(err.stack);
         });
+
+    // Clear console
+    process.stdout.write('\033c');
+
+    // Show datas
+    console.log('\n\n\n\n');
+    console.log('            Current ' + colors.yellow('sun') + '  : ' + sun);
+    console.log('            Current ' + colors.blue('wind') + ' : ' + wind);
 }
 
 
@@ -73,7 +82,7 @@ sp
                 console.log(data);
 
                 data = data.split(';');
-                sendData(data[0], data[1]);
+                sendData(parseFloat(data[0]), parseFloat(data[1]));
             })
             .on('close', function () {
                 console.log('Connection closed');
