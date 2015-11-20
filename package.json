@@ -1,0 +1,20 @@
+{
+  "name": "enseack-2015 central server",
+  "version": "1.0.0",
+  "description": "Enseak",
+  "main": "centralServer.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PymZoR/enseack-2015.git"
+  },
+  "author": "Robotik",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PymZoR/enseack-2015/issues"
+  },
+  "homepage": "https://github.com/PymZoR/enseack-2015#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
