@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <title>Enseak 2015</title>
+
+        <link rel="stylesheet" href="dist/chartist.min.css">
+
+        <style>
+            html, body {
+                font-family: sans-serif;
+                height: 100%;
+                margin: 0;
+                overflow: hidden;
+                padding: 0;
+                width: 100%;
+            }
+
+            h1 {
+                color: #222;
+                margin: 0;
+                padding: 10px 0;
+                text-align: center;
+            }
+
+            h1 a {
+                color: #2196F3;
+                text-decoration: none;
+            }
+
+            #graph {
+                height: calc(100% - 57px);
+                margin: 0 auto;
+                width: 95%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1><a href="/">&lsaquo;</a> Graphique d'efficacité solaire/éolien - <span id="cityName"></span></h1>
+        <div id="graph"></div>
+
+        <script defer src="dist/chartist.min.js"></script>
+        <script>
+            const cityName = location.hash.slice(1);
+            document.getElementById('cityName').textContent = cityName;
+
+            fetch('/chart/' + cityName, {
+                method: 'get'
+            }).then(function (response) {
+                return response.json();
+            }).catch(function () {
+                location.href = '/';
+            })
+            .then(function (response) {
+                var data = {
+                    labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                             'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                    series: [
+                        response.sun,
+                        response.wind
+                    ]
+                };
+
+                new Chartist.Line('#graph', data, {
+                    low: 0,
+                    high: 200
+                });
+            });
+        </script>
+    </body>
+</html>

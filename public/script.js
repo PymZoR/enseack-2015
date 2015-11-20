@@ -8,6 +8,7 @@ const $cityUptake        = document.getElementById('cityUptake');
 const $cityRenew         = document.getElementById('cityRenew');
 const $cityRenewPossible = document.getElementById('cityRenewPossible');
 const $shadow            = document.getElementById('shadow');
+const $loader            = document.getElementById('loader');
 const $body              = document.body;
 
 let map = L.map('map');
@@ -15,7 +16,7 @@ let map = L.map('map');
 map.setView(new L.LatLng(47, 2), 6);
 
 let osmUrl    = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-let osmAttrib ='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+let osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
 let osm = new L.TileLayer(osmUrl, {
     minZoom    : 6,
     maxZoom    : 12,
@@ -43,18 +44,24 @@ Object.keys(markers).forEach(function (name) {
     marker.on('click', function () {
         mapOpen = !mapOpen;
 
+        $loader.style.display = 'block';
+
         fetch('/percentRenwable/' + name, {
             method: 'get'
         }).then(function (response) {
             return response.json();
         }).then(function (response) {
-            $cityName.textContent          = name;
+            $cityName.innerHTML            = name + '&nbsp;&nbsp;<a href="/chart.html#' + name + '">(graphiques)</a>';
             $cityPopulation.textContent    = response.population;
             $cityUptake.textContent        = Math.round(response.uptake / 1000);
             $cityRenew.textContent         = Math.round(response.wattHRenwable / response.uptake * 1000) / 10;
             $cityRenewPossible.textContent = '100%';
 
             $body.className += ' loaderHide';
+
+            setTimeout(function () {
+                $loader.style.display = 'none';
+            }, 300);
         });
 
         if (mapOpen) {
@@ -63,7 +70,7 @@ Object.keys(markers).forEach(function (name) {
             $shadow.style.opacity = '0';
             setTimeout(function () {
                 $shadow.style.opacity = '0.7';
-            }, 10);
+            }, 50);
         } else {
             $body.className = '';
         }
