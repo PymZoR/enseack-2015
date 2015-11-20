@@ -2,64 +2,77 @@
 
 const express    = require('express');
 const bodyParser = require('body-parser');
-const axios      = require('axios');
 const app        = express();
 
-const PORT = 8080;
+const cityUptake         = require('./lib/cityUptake');
+const percentOfRenewable = require('./lib/percentOfRenewable');
 
-const HOME_UPTAKE_PER_YEAR = 7000;
+const PORT      = 8080;
+const FAKE_DAYS = 30;
+
+let cities = {};
 
 app.use(bodyParser.json());
-
 app.use(express.static('public'));
 
 app.get('/uptakeCity/:cityName', (req, res) => {
-    const BASE_URL       = 'http://www.insee.fr/fr/ppp/bases-de-donnees/recensement/populations-legales';
-    const NUMBER_URL     = `${BASE_URL}/zonages.xml.asp?q=`;
-    const POPULATION_URL = `${BASE_URL}/commune.asp?depcom=`;
-
-    // const cityName = req.body.cityName;
     const cityName = req.params.cityName;
 
-    console.log(`-> Asking city number for city : ${cityName}`);
-
-    axios
-        .get(NUMBER_URL + cityName)
-        .then(response => {
-            let firstStep = response.data.split('<zone codgeo="');
-
-            if (!firstStep[1]) {
-                throw new Error('No city found');
-            }
-
-            let cityIndex = firstStep[1].split('"')[0];
-
-            return cityIndex;
-        })
-        .then(cityIndex => axios.get(POPULATION_URL + cityIndex))
-        .then(response => {
-            const data           = response.data;
-            const lastChiffrePos = data.lastIndexOf('tab-chiffre');
-
-            // Slice from last position of tab-chiffre + 13 (size of tab-chiffre + end td tag)
-            // To the next </td appearing
-            let population = data
-                .slice(lastChiffrePos + 13, data.indexOf('</td>', lastChiffrePos))
-                .replace(/\D/g, '');
-
-            population = parseInt(population, 10);
-
-            const uptake = HOME_UPTAKE_PER_YEAR * population;
-
-            res.status(200).json({
-                uptake,
-                population
-            }).end();
+    cityUptake(cityName)
+        .then(data => {
+            res.status(200).json(data).end();
         })
         .catch(err => {
-            res.status(500).json({
-                err: err.message
-            }).end();
+            res.status(500).json(err).end();
+        });
+});
+
+app.get('/percentRenwable/:cityName', (req, res) => {
+    const cityName = req.params.cityName;
+
+    percentOfRenewable(cityName)
+        .then(data => {
+            res.status(200).json(data).end();
+        })
+        .catch(err => {
+            res.status(500).json(err).end();
+        });
+});
+
+app.post('/data', (req, res) => {
+    const cityName  = req.body.city;
+    const sunValue  = req.body.sun;
+    const windValue = req.body.wind;
+
+    let firstPromise = new Promise(resolve => resolve());
+
+    if (!cities[cityName]) {
+        firstPromise = cityUptake(cityName);
+    }
+
+    firstPromise
+        .then(data => {
+            if (!cities[cityName]) {
+                cities[cityName] = {
+                    originalPopulation: data.population,
+                    originalUptake    : data.uptake,
+                    sunSum            : 0,
+                    numberOfValues    : 0,
+                    windSum           : 0
+                };
+            }
+
+            for (let i = FAKE_DAYS - 1; i >= 0; i--) {
+                cities[cityName].sunSum  += sunValue;
+                cities[cityName].windSum += windValue;
+
+                cities[cityName].numberOfValues++;
+            }
+
+            res.status(200).end();
+        })
+        .catch(() => {
+            res.status(500).end();
         });
 });
 
