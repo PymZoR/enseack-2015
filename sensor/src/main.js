@@ -10,6 +10,13 @@ var SerialPort = sp.SerialPort;
 
 
 /**
+ * Clear console
+ */
+function cls() {
+    process.stdout.write('\033c');
+}
+
+/**
  * Send new sensors data to global server
  * @param {Number} sun sun power in lumens
  * @param {Number} wind wind power in km/h
@@ -31,10 +38,9 @@ function sendData(sun, wind) {
             console.log(err.stack);
         });
 
-    // Clear console
-    process.stdout.write('\033c');
 
     // Show datas
+    cls();
     console.log('\n\n\n\n');
     console.log('            Current ' + colors.yellow('sun') + '  : ' + sun);
     console.log('            Current ' + colors.blue('wind') + ' : ' + wind);
@@ -45,8 +51,8 @@ function sendData(sun, wind) {
  * Serial config
  */
 var serialOpts = {
-    baudrate: 115200,
-    parser: sp.parsers.readline("\n")
+    baudrate: 9600,
+    parser: sp.parsers.raw
 };
 var serialPort = null;
 
@@ -54,16 +60,19 @@ var serialPort = null;
 /**
  * Entry point
  */
+cls();
+
 sp
     .listAsync()
     .then(function (ports) {
         console.log('Found ports: ');
 
-        ports.forEach(function(port) {
-            console.log(port.comName);
-            console.log(port.pnpId);
-            console.log(port.manufacturer);
-        });
+        // Debug
+        // ports.forEach(function(port) {
+        //     console.log(port.comName);
+        //     console.log(port.pnpId);
+        //     console.log(port.manufacturer);
+        // });
 
         serialPort = new SerialPort(ports[0].comName, serialOpts);
         console.log("Opening connection on: " + ports[0].comName);
@@ -79,10 +88,10 @@ sp
             })
             .on('data', function (data) {
                 console.log('Data received: ');
-                console.log(data);
-
-                data = data.split(';');
-                sendData(parseFloat(data[0]), parseFloat(data[1]));
+                console.log(data.toString());
+                //
+                // data = data.split(';');
+                // sendData(parseFloat(data[0]), parseFloat(data[1]));
             })
             .on('close', function () {
                 console.log('Connection closed');
