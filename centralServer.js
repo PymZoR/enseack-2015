@@ -12,6 +12,7 @@ let sendMail           = require('./lib/sendMail');
 const PORT                 = 8080;
 const FAKE_DAYS            = 30;
 const HOME_UPTAKE_PER_YEAR = 7200;
+const NIGHT_COEF           = 0.52;
 
 let cities = {};
 
@@ -40,10 +41,11 @@ app.get('/percentRenwable/:cityName', (req, res) => {
     let totalKWH = 0;
 
     if (cities[cityName]) {
-        totalKWH = cities[cityName].sun.reduce((a, b) => a + b) +
+        totalKWH = cities[cityName].sun.reduce((a, b) => a + b) * NIGHT_COEF +
                    cities[cityName].wind.reduce((a, b) => a + b);
 
-        totalKWH /= HOME_UPTAKE_PER_YEAR * 100;
+        totalKWH = totalKWH / HOME_UPTAKE_PER_YEAR * 100;
+        totalKWH = totalKWH / 1000;
     }
 
     percentOfRenewable(cityName)
@@ -90,16 +92,21 @@ app.post('/data', (req, res) => {
         cities[cityName].wind.push(windValue);
     }
 
-    if (cities[cityName].sun.length === 12) {
-        let totalKWH = cities[cityName].sun.reduce((a, b) => a + b) +
+    console.log('New value for city ' + cityName,
+            cities[cityName].sun[cities[cityName].sun.length - 1],
+            cities[cityName].wind[cities[cityName].wind.length - 1]);
+    console.log('Number of values', cities[cityName].sun.length / FAKE_DAYS);
+
+    if (cities[cityName].sun.length / FAKE_DAYS === 12) {
+        let totalKWH = cities[cityName].sun.reduce((a, b) => a + b) * NIGHT_COEF +
                    cities[cityName].wind.reduce((a, b) => a + b);
 
-        totalKWH /= HOME_UPTAKE_PER_YEAR * 100;
+        totalKWH = totalKWH / HOME_UPTAKE_PER_YEAR * 100;
+        totalKWH = totalKWH / 1000;
 
-        sendMail(totalKWH < 10);
+        sendMail(totalKWH > 12);
     }
 
-    console.log('New value for city ' + cityName, cities[cityName]);
     io.emit('data', {
         city: cityName,
         sun : sunValue,
