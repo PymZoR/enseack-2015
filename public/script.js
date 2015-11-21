@@ -104,7 +104,7 @@ Object.keys(markers).forEach(function (name) {
 
             $cityPopulation.textContent    = response.population;
             $cityUptake.textContent        = Math.round(response.uptake / 1000);
-            $cityRenew.textContent         = Math.round(response.wattHRenwable / response.uptake * 1000) / 10;
+            $cityRenew.textContent         = Math.round(response.wattHRenwable / response.uptake * 1000) / 10 + '%';
             $cityRenewPossible.textContent = Math.round(response.totalKWH * 100) / 100 + '%';
 
             $body.className += ' loaderHide';
