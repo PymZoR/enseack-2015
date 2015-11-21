@@ -7,6 +7,7 @@ let server             = require('http').Server(app);
 let io                 = require('socket.io')(server);
 let cityUptake         = require('./lib/cityUptake');
 let percentOfRenewable = require('./lib/percentOfRenewable');
+let sendMail           = require('./lib/sendMail');
 
 const PORT                 = 8080;
 const FAKE_DAYS            = 30;
@@ -87,6 +88,15 @@ app.post('/data', (req, res) => {
     for (let i = FAKE_DAYS - 1; i >= 0; i--) {
         cities[cityName].sun.push(sunValue);
         cities[cityName].wind.push(windValue);
+    }
+
+    if (cities[cityName].sun.length === 12) {
+        let totalKWH = cities[cityName].sun.reduce((a, b) => a + b) +
+                   cities[cityName].wind.reduce((a, b) => a + b);
+
+        totalKWH /= HOME_UPTAKE_PER_YEAR * 100;
+
+        sendMail(totalKWH < 10);
     }
 
     console.log('New value for city ' + cityName, cities[cityName]);
