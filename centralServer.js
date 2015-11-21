@@ -64,8 +64,8 @@ app.post('/data', (req, res) => {
 
     if (!cities[cityName]) {
         cities[cityName] = {
-            sun : 0,
-            wind: 0
+            sun : [],
+            wind: []
         };
     }
 
@@ -73,6 +73,8 @@ app.post('/data', (req, res) => {
         cities[cityName].sun.push(sunValue);
         cities[cityName].wind.push(windValue);
     }
+
+    console.log('New value for city ' + cityName, cities[cityName]);
 
     res.status(200).end();
 });

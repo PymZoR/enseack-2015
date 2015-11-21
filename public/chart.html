@@ -39,7 +39,7 @@
         <div id="graph"></div>
 
         <script defer src="dist/chartist.min.js"></script>
-        <script>
+        <script defer>
             const cityName = location.hash.slice(1);
             document.getElementById('cityName').textContent = cityName;
 
@@ -51,6 +51,9 @@
                 location.href = '/';
             })
             .then(function (response) {
+                response.sun  = response.sun.filter((v, i) => i % 30 === 0);
+                response.wind = response.wind.filter((v, i) => i % 30 === 0);
+
                 var data = {
                     labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
                              'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
