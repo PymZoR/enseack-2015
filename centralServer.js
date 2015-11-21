@@ -8,15 +8,11 @@ let io                 = require('socket.io')(server);
 let cityUptake         = require('./lib/cityUptake');
 let percentOfRenewable = require('./lib/percentOfRenewable');
 
-const PORT      = 8080;
-const FAKE_DAYS = 30;
+const PORT                 = 8080;
+const FAKE_DAYS            = 30;
+const HOME_UPTAKE_PER_YEAR = 7200;
 
-let cities = {
-    Paris: {
-        sun : [ 100, 125, 122, 100, 122, 140, 145, 145, 130, 100, 90, 80 ],
-        wind: [ 86, 134, 87, 141, 92, 142, 96, 124, 88, 112, 143, 117 ]
-    }
-};
+let cities = {};
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -40,8 +36,18 @@ app.get('/uptakeCity/:cityName', (req, res) => {
 app.get('/percentRenwable/:cityName', (req, res) => {
     const cityName = req.params.cityName;
 
+    let totalKWH = 0;
+
+    if (cities[cityName]) {
+        totalKWH = cities[cityName].sun.reduce((a, b) => a + b) +
+                   cities[cityName].wind.reduce((a, b) => a + b);
+
+        totalKWH /= HOME_UPTAKE_PER_YEAR * 100;
+    }
+
     percentOfRenewable(cityName)
         .then(data => {
+            data.totalKWH = totalKWH;
             res.status(200).json(data).end();
         })
         .catch(err => {

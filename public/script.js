@@ -62,17 +62,17 @@ Object.keys(markers).forEach(function (name) {
             $a.addEventListener('click', function (e) {
                 e.preventDefault();
                 $frame.src = 'chart.html#' + marker.options.title;
-                $frame.onload = function () {
-                    $frameContainer.style.top = '0';
-                };
             }, false);
+            $frame.onload = function () {
+                $frameContainer.style.top = '0';
+            };
 
             $cityName.appendChild($a);
 
             $cityPopulation.textContent    = response.population;
             $cityUptake.textContent        = Math.round(response.uptake / 1000);
             $cityRenew.textContent         = Math.round(response.wattHRenwable / response.uptake * 1000) / 10;
-            $cityRenewPossible.textContent = '100%';
+            $cityRenewPossible.textContent = response.totalKWH + '%';
 
             $body.className += ' loaderHide';
 
