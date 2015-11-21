@@ -42,7 +42,7 @@ function cls() {
 function luxToWh(klux) {
     console.log('GOT ', klux);
   const MAX_LUX = 120 * 1000;
-  const KWH_M2_MAX_LUX = 0.8 / 24;
+  const KWH_M2_MAX_LUX = 0.8;
 
   const percentMaxLux = klux * 1000 / MAX_LUX;
   console.log('That means', percentMaxLux, 'of 130klux');
