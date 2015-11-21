@@ -8,7 +8,6 @@ var colors     = require('colors');
 var sp         = Promise.promisifyAll(require('serialport'));
 var SerialPort = sp.SerialPort;
 
-
 /**
  * Clear console
  */
@@ -28,16 +27,15 @@ function sendData(sun, wind) {
         wind: wind
     };
 
-    console.log("Sending data...");
+
     httpClient
-        .post(config.centralSever.hostURL, data)
+        .post(config.centralServer.hostURL, data)
         .then(function (res) {
-            console.log("res: " + res);
+            // console.log("res: " + res);
         })
         .catch(function (err) {
-            console.log(err.stack);
+            // console.log(err.stack);
         });
-
 
     // Show datas
     cls();
@@ -54,6 +52,7 @@ var serialOpts = {
     baudrate: 9600,
     parser: sp.parsers.raw
 };
+
 var serialPort = null;
 
 
@@ -61,13 +60,18 @@ var serialPort = null;
  * Entry point
  */
 cls();
+var inputBuffer  = ""
+var wind         = 0;
+var sun          = 0;
+var windReceived = false;
+var sunReceived  = false;
 
 sp
     .listAsync()
     .then(function (ports) {
-        console.log('Found ports: ');
 
         // Debug
+        // console.log('Found ports: ');
         // ports.forEach(function(port) {
         //     console.log(port.comName);
         //     console.log(port.pnpId);
@@ -75,23 +79,55 @@ sp
         // });
 
         serialPort = new SerialPort(ports[0].comName, serialOpts);
-        console.log("Opening connection on: " + ports[0].comName);
+        // console.log("Opening connection on: " + ports[0].comName);
         return serialPort.openAsync();
    })
+
    .then(function () {
         /**
         * Connection listeners
         */
         serialPort
             .on('open', function () {
-                console.log('Connection opened');
+                // console.log('Connection opened');
             })
             .on('data', function (data) {
-                console.log('Data received: ');
-                console.log(data.toString());
-                //
-                // data = data.split(';');
-                // sendData(parseFloat(data[0]), parseFloat(data[1]));
+                // console.log('Data received: ');
+                // console.log(data.toString());
+                inputBuffer += data;
+
+                var windInput = inputBuffer.split('V');
+                if (windInput.length >= 2) {
+                    var valueInput = windInput[1].split('Z');
+                    if (valueInput.length >= 2) {
+                        wind = valueInput[0];
+                        inputBuffer = valueInput[1];
+                        windReceived = true;
+                    }
+                    else {
+                        inputBuffer = 'V' + windInput[1];
+                    }
+                }
+
+                var sunInput = inputBuffer.split('S');
+                if (sunInput.length >= 2) {
+                    var valueInput = sunInput[1].split('Z');
+                    if (valueInput.length >= 2) {
+                        sun = valueInput[0];
+                        inputBuffer = valueInput[1];
+                        sunReceived = true;
+                    }
+                    else {
+                        inputBuffer = 'S' + sunInput[1];
+                    }
+                }
+
+
+                if (windReceived && sunReceived) {
+                    sendData(parseFloat(sun), parseFloat(wind));
+                    windReceived = false;
+                    sunReceived  = false;
+                }
             })
             .on('close', function () {
                 console.log('Connection closed');

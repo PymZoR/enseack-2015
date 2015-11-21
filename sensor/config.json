@@ -1,6 +1,6 @@
 {
     "centralServer": {
-        "hostURL": "192.168.100.103:8080"
+        "hostURL": "http://192.168.100.103:8080/data"
     },
     "city": "Cergy"
 }
