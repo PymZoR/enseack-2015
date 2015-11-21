@@ -11,7 +11,7 @@ var SerialPort = sp.SerialPort;
 
 var data = {
   0: 0,
-  4: 11,25,
+  4: 11.25,
   8: 45,
   12: 140.625,
   16: 281.25,
