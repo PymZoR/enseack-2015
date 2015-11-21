@@ -1,6 +1,6 @@
 'use strict';
 
-/* global L, fetch, document */
+/* global L, fetch, document, MouseEvent */
 
 const $cityName          = document.getElementById('cityName');
 const $cityPopulation    = document.getElementById('cityPopulation');
@@ -9,6 +9,9 @@ const $cityRenew         = document.getElementById('cityRenew');
 const $cityRenewPossible = document.getElementById('cityRenewPossible');
 const $shadow            = document.getElementById('shadow');
 const $loader            = document.getElementById('loader');
+const $frameContainer    = document.getElementById('frame-container');
+const $frame             = document.getElementById('frame');
+const $back              = document.getElementById('back');
 const $body              = document.body;
 
 let map = L.map('map');
@@ -51,7 +54,21 @@ Object.keys(markers).forEach(function (name) {
         }).then(function (response) {
             return response.json();
         }).then(function (response) {
-            $cityName.innerHTML            = name + '&nbsp;&nbsp;<a href="/chart.html#' + name + '">(graphiques)</a>';
+            $cityName.innerHTML            = name + '&nbsp;&nbsp;';
+
+            let $a = document.createElement('a');
+            $a.textContent = '(graphiques)';
+            $a.href        = '#';
+            $a.addEventListener('click', function (e) {
+                e.preventDefault();
+                $frame.src = 'chart.html#' + marker.options.title;
+                $frame.onload = function () {
+                    $frameContainer.style.top = '0';
+                };
+            }, false);
+
+            $cityName.appendChild($a);
+
             $cityPopulation.textContent    = response.population;
             $cityUptake.textContent        = Math.round(response.uptake / 1000);
             $cityRenew.textContent         = Math.round(response.wattHRenwable / response.uptake * 1000) / 10;
@@ -90,4 +107,13 @@ $shadow.addEventListener('click', function () {
     setTimeout(function () {
         $shadow.style.display = 'none';
     }, 300);
+}, false);
+
+$back.addEventListener('click', function () {
+    $frame.src = '';
+    setTimeout(function () {
+        $frameContainer.style.top = '-100%';
+    }, 500);
+    let e = new MouseEvent('click');
+    $shadow.dispatchEvent(e);
 }, false);

@@ -4,12 +4,12 @@ let express            = require('express');
 let bodyParser         = require('body-parser');
 let app                = express();
 let server             = require('http').Server(app);
-var io                 = require('socket.io')(server);
+let io                 = require('socket.io')(server);
 let cityUptake         = require('./lib/cityUptake');
 let percentOfRenewable = require('./lib/percentOfRenewable');
 
-const PORT             = 8080;
-const FAKE_DAYS        = 30;
+const PORT      = 8080;
+const FAKE_DAYS = 30;
 
 let cities = {
     Paris: {
@@ -23,6 +23,7 @@ app.use(express.static('public'));
 app.use(express.static('node_modules/leaflet'));
 app.use(express.static('node_modules/loaders.css'));
 app.use(express.static('node_modules/chartist'));
+app.use(express.static('node_modules/Swipe'));
 
 app.get('/uptakeCity/:cityName', (req, res) => {
     const cityName = req.params.cityName;
