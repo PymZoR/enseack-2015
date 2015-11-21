@@ -14,7 +14,7 @@ a {
 
 #shadow {
     background-color: #000;
-    height: calc(100% - 78px);
+    height: calc(100% - 100px);
     left: 0;
     opacity: 0.7;
     position: absolute;
@@ -31,13 +31,14 @@ a {
 }
 
 .mapOpen #map {
-    height: calc(100% - 78px);
+    height: calc(100% - 100px);
 }
 
 #table {
     background: #fff;
-    bottom: -80px;
+    bottom: -100px;
     box-sizing: border-box;
+    height: 100px;
     position: absolute;
     transition: bottom .3s ease;
     width: 100%;
@@ -70,6 +71,7 @@ table {
     border-spacing: 0;
     border: 1px solid #cbcbcb;
     empty-cells: show;
+    height: 100%;
     width: 100%;
 }
 
