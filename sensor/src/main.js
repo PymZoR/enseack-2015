@@ -40,15 +40,15 @@ function cls() {
  * @return {Number} W.h
  */
 function luxToWh(klux) {
-    console.log('GOT ', klux);
+    // console.log('GOT ', klux);
   const MAX_LUX = 120 * 1000;
   const KWH_M2_MAX_LUX = 0.8;
 
   const percentMaxLux = klux * 1000 / MAX_LUX;
-  console.log('That means', percentMaxLux, 'of 130klux');
+  // console.log('That means', percentMaxLux, 'of 130klux');
 
   const wh = percentMaxLux * KWH_M2_MAX_LUX * config.roofSurface;
-  console.log('result :', wh);
+  // console.log('result :', wh);
 
   return wh;
 }
@@ -133,7 +133,11 @@ var serialPort = null;
 /**
  * Entry point
  */
-cls();
+
+setTimeout(function() {
+    cls();
+}, 1000);
+
 var inputBuffer  = ""
 var wind         = 0;
 var sun          = 0;
