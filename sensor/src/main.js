@@ -85,7 +85,7 @@ function kmHToWh(kmH) {
 
     var value = a * miles + b;
 
-    return value;
+    return value * 24;
 }
 
 
