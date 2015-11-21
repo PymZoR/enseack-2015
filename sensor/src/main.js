@@ -31,21 +31,24 @@ var data = {
  * Clear console
  */
 function cls() {
-    process.stdout.write('\033c');
+    //process.stdout.write('\033c');
 }
 
 /**
- * Convert lux to W.h
- * @param {Number} lux
+ * Convert klux to W.h
+ * @param {Number} klux
  * @return {Number} W.h
  */
-function luxToWh(lux) {
+function luxToWh(klux) {
+    console.log('GOT ', klux);
   const MAX_LUX = 120 * 1000;
   const KWH_M2_MAX_LUX = 0.8 / 24;
 
-  const percentMaxLux = lux / MAX_LUX;
+  const percentMaxLux = klux * 1000 / MAX_LUX;
+  console.log('That means', percentMaxLux, 'of 130klux');
 
   const wh = percentMaxLux * KWH_M2_MAX_LUX * config.roofSurface;
+  console.log('result :', wh);
 
   return wh;
 }
