@@ -31,7 +31,7 @@ var data = {
  * Clear console
  */
 function cls() {
-    //process.stdout.write('\033c');
+    process.stdout.write('\033c');
 }
 
 /**
