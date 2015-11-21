@@ -15,6 +15,7 @@ const $back              = document.getElementById('back');
 const $body              = document.body;
 
 let map = L.map('map');
+let fakesPoints = [];
 
 map.setView(new L.LatLng(47, 2), 6);
 
@@ -34,16 +35,41 @@ let markers = {
     Cergy : L.marker([49.0376128, 2.02858], {
         title: 'Cergy'
     }).addTo(map),
-    Paris : L.marker([48.8589507, 2.2775171], {
-        title: 'Paris'
-    }).addTo(map),
     Troyes: L.marker([48.2924582, 4.0411011], {
         title: 'Troyes'
+    }).addTo(map),
+    Rennes: L.marker([48.1159102, -1.7234738], {
+        title: 'Rennes'
+    }).addTo(map),
+    Lyon: L.marker([45.7579502, 4.8001017], {
+        title: 'Lyon'
+    }).addTo(map),
+    Bordeaux: L.marker([44.8637226, -0.6211603], {
+        title: 'Bordeaux'
+    }).addTo(map),
+    Marseille: L.marker([43.2803692, 5.3350996], {
+        title: 'Marseille'
+    }).addTo(map),
+    Poitiers: L.marker([46.5846287, 0.3364502], {
+        title: 'Poitiers'
     }).addTo(map)
 };
 
+let iconRed = L.icon({
+    iconUrl        : 'marker-icon-red.png',
+    iconRetinaUrl  : 'marker-icon@2x-red.png',
+    iconSize       : [25, 41],
+    iconAnchor     : [12, 41],
+    shadowUrl      : 'dist/images/marker-shadow.png',
+    shadowRetinaUrl: 'dist/images/marker-shadow@2x.png',
+    shadowSize     : [41, 41]
+});
+
 Object.keys(markers).forEach(function (name) {
     let marker = markers[name];
+
+    generateFakeMarkersNearby(marker);
+
     marker.on('click', function () {
         mapOpen = !mapOpen;
 
@@ -114,6 +140,40 @@ $back.addEventListener('click', function () {
     setTimeout(function () {
         $frameContainer.style.top = '-100%';
     }, 500);
-    let e = new MouseEvent('click');
+    const e = new MouseEvent('click');
     $shadow.dispatchEvent(e);
 }, false);
+
+map.on('zoomend', function (e) {
+    const level = e.target._zoom;
+    if (level >= 11) {
+        fakesPoints.forEach(function (marker) {
+            marker.setOpacity(1);
+        });
+    } else {
+        fakesPoints.forEach(function (marker) {
+            marker.setOpacity(0);
+        });
+    }
+});
+
+function generateFakeMarkersNearby (marker) {
+    const initPos = marker._latlng;
+
+    for (let i = 0; i < 10; i++) {
+        const newPos = [
+            initPos.lat + getRandom(-0.05, 0.05),
+            initPos.lng + getRandom(-0.05, 0.05)
+        ];
+
+        let newMarker = L.marker(newPos, {
+            icon: iconRed
+        }).addTo(map);
+        newMarker.setOpacity(0);
+        fakesPoints.push(newMarker);
+    }
+}
+
+function getRandom (min, max) {
+    return Math.random() * (max - min) + min;
+}
