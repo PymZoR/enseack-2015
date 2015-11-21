@@ -8,12 +8,75 @@ var colors     = require('colors');
 var sp         = Promise.promisifyAll(require('serialport'));
 var SerialPort = sp.SerialPort;
 
+
+var data = {
+  0: 0,
+  4: 15,
+  8: 60,
+  12: 187.5,
+  16: 375,
+  20: 700,
+  24: 950,
+  28: 1220,
+  32: 1200,
+  36: 1120,
+  40: 1000,
+  44: 940,
+  48: 900,
+  52: 880,
+  56: 0
+};
+
 /**
  * Clear console
  */
 function cls() {
     process.stdout.write('\033c');
 }
+
+/**
+ * Convert lux to W.h
+ * @param {Number} lux
+ * @return {Number} W.h
+ */
+function luxToWh(lux) {
+    return (lux * 1000 * config.roofSurface / 93) * 0.14;
+}
+
+/**
+ * Conver km/h to W.h
+ * @param {Number} km.h
+ * @return {Number} W.h
+ */
+function kmHToWh(kmH) {
+    var miles = kmH / 1.6;
+    if (miles > 56 || miles < 0) {
+      return 0;
+    }
+
+    if (data[miles] !== undefined) {
+        return data[miles];
+    }
+
+    var breakpoints = Object.keys(data);
+    var x1, x2, y1, y2;
+    breakpoints.forEach(breakpoint => {
+        if (!(miles - 4 > breakpoint) && !x1) {
+            x1 = breakpoint;
+            y1 = data[x1];
+            x2 = (parseInt(breakpoint, 10) + 4).toString();
+            y2 = data[x2];
+        }
+    });
+
+    var a = (y2 - y1)/(x2 - x1);
+    var b = ((x2 * y1) - (x1 * y2)) / (x2 - x1);
+
+    var value = a * miles + b;
+
+    return value;
+}
+
 
 /**
  * Send new sensors data to global server
@@ -23,8 +86,8 @@ function cls() {
 function sendData(sun, wind) {
     var data = {
         city: config.city,
-        sun: sun,
-        wind: wind
+        sun: luxToWh(sun),
+        wind: kmHToWh(wind)
     };
 
 
