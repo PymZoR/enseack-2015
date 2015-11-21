@@ -40,8 +40,16 @@ function cls() {
  * @return {Number} W.h
  */
 function luxToWh(lux) {
-    return (lux * 1000 * config.roofSurface / 93) * 0.14;
+  const MAX_LUX = 120 * 1000;
+  const KWH_M2_MAX_LUX = 0.8 / 24;
+
+  const percentMaxLux = lux / MAX_LUX;
+
+  const wh = percentMaxLux * KWH_M2_MAX_LUX * config.roofSurface;
+
+  return wh;
 }
+
 
 /**
  * Conver km/h to W.h
