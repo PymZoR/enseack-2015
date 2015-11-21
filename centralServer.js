@@ -41,11 +41,10 @@ app.get('/percentRenwable/:cityName', (req, res) => {
     let totalKWH = 0;
 
     if (cities[cityName]) {
-        totalKWH = cities[cityName].sun.reduce((a, b) => a + b) * NIGHT_COEF +
+        totalKWH = cities[cityName].sun.reduce((a, b) => a + b) +
                    cities[cityName].wind.reduce((a, b) => a + b);
 
         totalKWH = totalKWH / HOME_UPTAKE_PER_YEAR * 100;
-        totalKWH = totalKWH / 1000;
     }
 
     percentOfRenewable(cityName)
@@ -77,8 +76,8 @@ app.get('/chart/:cityName', (req, res) => {
 
 app.post('/data', (req, res) => {
     const cityName  = req.body.city;
-    const sunValue  = req.body.sun;
-    const windValue = req.body.wind;
+    const sunValue  = req.body.sun * NIGHT_COEF;
+    const windValue = req.body.wind / 1000;
 
     if (!cities[cityName]) {
         cities[cityName] = {
@@ -92,17 +91,14 @@ app.post('/data', (req, res) => {
         cities[cityName].wind.push(windValue);
     }
 
-    console.log('New value for city ' + cityName,
-            cities[cityName].sun[cities[cityName].sun.length - 1],
-            cities[cityName].wind[cities[cityName].wind.length - 1]);
+    console.log('New value for city ' + cityName, sunValue, windValue);
     console.log('Number of values', cities[cityName].sun.length / FAKE_DAYS);
 
     if (cities[cityName].sun.length / FAKE_DAYS === 12) {
-        let totalKWH = cities[cityName].sun.reduce((a, b) => a + b) * NIGHT_COEF +
+        let totalKWH = cities[cityName].sun.reduce((a, b) => a + b) +
                    cities[cityName].wind.reduce((a, b) => a + b);
 
         totalKWH = totalKWH / HOME_UPTAKE_PER_YEAR * 100;
-        totalKWH = totalKWH / 1000;
 
         sendMail(totalKWH > 12);
     }

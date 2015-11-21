@@ -27,6 +27,10 @@
                 margin: 0 auto;
                 width: 95%;
             }
+
+            .ct-series-b .ct-bar, .ct-series-b .ct-line, .ct-series-b .ct-point, .ct-series-b .ct-slice-donut {
+                stroke: #40d47e;
+            }
         </style>
     </head>
 
@@ -65,12 +69,13 @@
                 data.series = [ sunData, windData ];
 
                 $chart = new Chartist.Line('#graph', data, {
-                    low: 0,
-                    high: 4000
+                    low       : 0,
+                    high      : 20,
+                    lineSmooth: false
                 });
             });
             // Socket.io
-            var socket = io.connect('http://localhost:8080');
+            var socket = io.connect('http://192.168.100.203:8080');
             socket.on('data', function (data) {
                 if (data.city === cityName) {
                     sunData.push(data.sun);

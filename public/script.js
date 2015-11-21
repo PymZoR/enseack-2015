@@ -33,25 +33,32 @@ let mapOpen = false;
 
 let markers = {
     Cergy : L.marker([49.0376128, 2.02858], {
-        title: 'Cergy'
+        title       : 'Cergy',
+        zIndexOffset: 1000
     }).addTo(map),
     Troyes: L.marker([48.2924582, 4.0411011], {
-        title: 'Troyes'
+        title       : 'Troyes',
+        zIndexOffset: 1000
     }).addTo(map),
     Rennes: L.marker([48.1159102, -1.7234738], {
-        title: 'Rennes'
+        title       : 'Rennes',
+        zIndexOffset: 1000
     }).addTo(map),
     Lyon: L.marker([45.7579502, 4.8001017], {
-        title: 'Lyon'
+        title       : 'Lyon',
+        zIndexOffset: 1000
     }).addTo(map),
     Bordeaux: L.marker([44.8637226, -0.6211603], {
-        title: 'Bordeaux'
+        title       : 'Bordeaux',
+        zIndexOffset: 1000
     }).addTo(map),
     Marseille: L.marker([43.2803692, 5.3350996], {
-        title: 'Marseille'
+        title       : 'Marseille',
+        zIndexOffset: 1000
     }).addTo(map),
     Poitiers: L.marker([46.5846287, 0.3364502], {
-        title: 'Poitiers'
+        title       : 'Poitiers',
+        zIndexOffset: 1000
     }).addTo(map)
 };
 
