@@ -1,14 +1,15 @@
 'use strict';
 
-const express    = require('express');
-const bodyParser = require('body-parser');
-const app        = express();
+let express            = require('express');
+let bodyParser         = require('body-parser');
+let app                = express();
+let server             = require('http').Server(app);
+var io                 = require('socket.io')(server);
+let cityUptake         = require('./lib/cityUptake');
+let percentOfRenewable = require('./lib/percentOfRenewable');
 
-const cityUptake         = require('./lib/cityUptake');
-const percentOfRenewable = require('./lib/percentOfRenewable');
-
-const PORT      = 8080;
-const FAKE_DAYS = 30;
+const PORT             = 8080;
+const FAKE_DAYS        = 30;
 
 let cities = {
     Paris: {
@@ -49,12 +50,19 @@ app.get('/percentRenwable/:cityName', (req, res) => {
 
 app.get('/chart/:cityName', (req, res) => {
     const cityName = req.params.cityName;
+    let values;
 
     if (!cities[cityName]) {
-        return res.status(404).end();
+        values = {
+            sun : [0],
+            wind: [0]
+        };
+    }
+    else {
+        values = cities[cityName];
     }
 
-    res.status(200).json(cities[cityName]).end();
+    res.status(200).json(values).end();
 });
 
 app.post('/data', (req, res) => {
@@ -75,11 +83,15 @@ app.post('/data', (req, res) => {
     }
 
     console.log('New value for city ' + cityName, cities[cityName]);
+    io.emit('data', {
+        city: cityName,
+        sun : sunValue,
+        wind: windValue
+    });
 
     res.status(200).end();
 });
 
-const server = app.listen(PORT, () => {
-    const addr = server.address();
-    console.log(`Listening at http://${addr.address}:${addr.port}`);
+server.listen(PORT, () => {
+    console.log('Server listening on 0.0.0.0:' + PORT);
 });

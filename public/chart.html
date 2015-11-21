@@ -38,35 +38,51 @@
         <h1><a href="/">&lsaquo;</a> Graphique d'efficacité solaire/éolien - <span id="cityName"></span></h1>
         <div id="graph"></div>
 
-        <script defer src="dist/chartist.min.js"></script>
-        <script defer>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/dist/chartist.min.js"></script>
+        <script>
             const cityName = location.hash.slice(1);
             document.getElementById('cityName').textContent = cityName;
 
+            var sunData  = [];
+            var windData = [];
+            var $chart;
+            var data = {
+                labels: ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                         'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+            };
+
             fetch('/chart/' + cityName, {
                 method: 'get'
-            }).then(function (response) {
-                return response.json();
-            }).catch(function () {
-                location.href = '/';
             })
             .then(function (response) {
-                response.sun  = response.sun.filter((v, i) => i % 30 === 0);
-                response.wind = response.wind.filter((v, i) => i % 30 === 0);
+                return response.json();
+            })
+            .catch(function (err) {
+                console.log(err.stack);
+                // location.href = '/';
+            })
+            .then(function (response) {
+                sunData = response.sun.filter((v, i) => i % 30 === 0);
+                windData = response.wind.filter((v, i) => i % 30 === 0);
 
-                var data = {
-                    labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                             'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-                    series: [
-                        response.sun,
-                        response.wind
-                    ]
-                };
+                data.series = [ sunData, windData ];
 
-                new Chartist.Line('#graph', data, {
+                $chart = new Chartist.Line('#graph', data, {
                     low: 0,
-                    high: 200
+                    high: 4000
                 });
+            });
+            // Socket.io
+            var socket = io.connect('http://localhost:8080');
+            socket.on('data', function (data) {
+                if (data.city === cityName) {
+                    sunData.push(data.sun);
+                    windData.push(data.wind);
+
+                    data.series = [ sunData, windData ];
+                    $chart.update();
+                }
             });
         </script>
     </body>
